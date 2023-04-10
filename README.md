@@ -1,6 +1,6 @@
 # FaultToleranceJSONDecoder
 
-A json decoder has fault tolerance. Most of codes based on [JSONDecoder.swift](https://github.com/apple/swift-corelibs-foundation/blob/9c4cec91fe344dd25c23aa1971eb36f926bfcaf4/Sources/Foundation/JSONDecoder.swift).
+A json decoder has fault tolerance. Most of codes are based on [JSONDecoder.swift](https://github.com/apple/swift-corelibs-foundation/blob/9c4cec91fe344dd25c23aa1971eb36f926bfcaf4/Sources/Foundation/JSONDecoder.swift).
 
 ### Dependency
 
