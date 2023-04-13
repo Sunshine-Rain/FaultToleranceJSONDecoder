@@ -311,7 +311,7 @@ fileprivate struct FaultToleranceJSONDecoderImpl {
             }
             catch {
                 debugPrint(error.localizedDescription)
-                return defaultValueByOption(option: faultOptons.dataToleranceStrategy)
+                return defaultValueByOption(option: faultOptons.dataToleranceStrategy, in: JSON.null)
             }
 
         case .base64:
@@ -387,10 +387,37 @@ fileprivate struct FaultToleranceJSONDecoderImpl {
         return result as! T
     }
     
-    fileprivate func defaultValueByOption<T>(option: FaultToleranceJSONDecoder.FaultStrategy<T>) -> T {
+    fileprivate func defaultValueByOption<T>(option: FaultToleranceJSONDecoder.FaultStrategy<T>, in json: JSON? = nil) -> T {
+        guard let json = json else {
+            switch option {
+            case .useDefaultValue(let val):
+                return val
+            }
+        }
+        
         switch option {
         case .useDefaultValue(let val):
-            return val
+            if val is Bool {
+                let swiftyJsonValue = json.boolValue
+                return swiftyJsonValue == swiftJsonDefaultBoolValue ? val : (swiftyJsonValue as! T)
+            } else if val is Int {
+                let swiftyJsonValue = json.intValue
+                return swiftyJsonValue == swiftJsonDefaultIntValue ? val : (swiftyJsonValue as! T)
+            } else if val is UInt {
+                let swiftyJsonValue = json.uIntValue
+                return swiftyJsonValue == swiftJsonDefaultUIntValue ? val : (swiftyJsonValue as! T)
+            } else if val is Float {
+                let swiftyJsonValue = json.floatValue
+                return swiftyJsonValue == swiftJsonDefaultFloatValue ? val : (swiftyJsonValue as! T)
+            } else if val is Double {
+                let swiftyJsonValue = json.doubleValue
+                return swiftyJsonValue == swiftJsonDefaultDoubleValue ? val : (swiftyJsonValue as! T)
+            } else if val is String {
+                let swiftyJsonValue = json.stringValue
+                return swiftyJsonValue == swiftJsonDefaultStringValue ? val : (swiftyJsonValue as! T)
+            } else {
+                return val
+            }
         }
     }
     
@@ -505,72 +532,72 @@ extension FaultToleranceJSONDecoderImpl {
         
         func decode(_ type: Bool.Type, forKey key: K) -> Bool {
             let value = getValue(forKey: key)
-            return value.bool ?? impl.defaultValueByOption(option: impl.faultOptons.boolToleranceStrategy)
+            return value.bool ?? impl.defaultValueByOption(option: impl.faultOptons.boolToleranceStrategy, in: value)
         }
         
         func decode(_ type: String.Type, forKey key: K) -> String {
             let value = getValue(forKey: key)
-            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy)
+            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy, in: value)
         }
         
         func decode(_: Double.Type, forKey key: K) -> Double {
             let value = getValue(forKey: key)
-            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy)
+            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy, in: value)
         }
         
         func decode(_: Float.Type, forKey key: K) -> Float {
             let value = getValue(forKey: key)
-            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy)
+            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy, in: value)
         }
         
         func decode(_: Int.Type, forKey key: K) -> Int {
             let value = getValue(forKey: key)
-            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy)
+            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value)
         }
         
         func decode(_: Int8.Type, forKey key: K) -> Int8 {
             let value = getValue(forKey: key)
-            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         func decode(_: Int16.Type, forKey key: K) -> Int16 {
             let value = getValue(forKey: key)
-            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         func decode(_: Int32.Type, forKey key: K) -> Int32 {
             let value = getValue(forKey: key)
-            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         func decode(_: Int64.Type, forKey key: K) -> Int64 {
             let value = getValue(forKey: key)
-            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         func decode(_: UInt.Type, forKey key: K) -> UInt {
             let value = getValue(forKey: key)
-            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy)
+            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value)
         }
         
         func decode(_: UInt8.Type, forKey key: K) -> UInt8 {
             let value = getValue(forKey: key)
-            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         func decode(_: UInt16.Type, forKey key: K) -> UInt16 {
             let value = getValue(forKey: key)
-            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         func decode(_: UInt32.Type, forKey key: K) -> UInt32 {
             let value = getValue(forKey: key)
-            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         func decode(_: UInt64.Type, forKey key: K) -> UInt64 {
             let value = getValue(forKey: key)
-            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         func decode<T>(_: T.Type, forKey key: K) throws -> T where T: Decodable {
@@ -722,91 +749,91 @@ extension FaultToleranceJSONDecoderImpl {
             let value = try self.getNextValue(ofType: String.self)
             
             self.currentIndex += 1
-            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy)
+            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy, in: value)
         }
         
         mutating func decode(_: Double.Type) throws -> Double {
             let value = try self.getNextValue(ofType: Double.self)
             
             self.currentIndex += 1
-            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy)
+            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy, in: value)
         }
         
         mutating func decode(_: Float.Type) throws -> Float {
             let value = try self.getNextValue(ofType: Float.self)
             
             self.currentIndex += 1
-            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy)
+            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy, in: value)
         }
         
         mutating func decode(_: Int.Type) throws -> Int {
             let value = try self.getNextValue(ofType: Int.self)
             
             self.currentIndex += 1
-            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy)
+            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value)
         }
         
         mutating func decode(_: Int8.Type) throws -> Int8 {
             let value = try self.getNextValue(ofType: Int8.self)
             
             self.currentIndex += 1
-            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         mutating func decode(_: Int16.Type) throws -> Int16 {
             let value = try self.getNextValue(ofType: Int16.self)
             
             self.currentIndex += 1
-            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         mutating func decode(_: Int32.Type) throws -> Int32 {
             let value = try self.getNextValue(ofType: Int32.self)
             
             self.currentIndex += 1
-            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         mutating func decode(_: Int64.Type) throws -> Int64 {
             let value = try self.getNextValue(ofType: Int64.self)
             
             self.currentIndex += 1
-            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
         
         mutating func decode(_: UInt.Type) throws -> UInt {
             let value = try self.getNextValue(ofType: UInt.self)
             
             self.currentIndex += 1
-            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy)
+            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value)
         }
         
         mutating func decode(_: UInt8.Type) throws -> UInt8 {
             let value = try self.getNextValue(ofType: UInt8.self)
             
             self.currentIndex += 1
-            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         mutating func decode(_: UInt16.Type) throws -> UInt16 {
             let value = try self.getNextValue(ofType: UInt16.self)
             
             self.currentIndex += 1
-            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         mutating func decode(_: UInt32.Type) throws -> UInt32 {
             let value = try self.getNextValue(ofType: UInt32.self)
             
             self.currentIndex += 1
-            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         mutating func decode(_: UInt64.Type) throws -> UInt64 {
             let value = try self.getNextValue(ofType: UInt64.self)
             
             self.currentIndex += 1
-            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
         
         mutating func decode<T>(_: T.Type) throws -> T where T: Decodable {
@@ -1018,59 +1045,59 @@ extension FaultToleranceJSONDecoderImpl {
         }
 
         func decode(_: Bool.Type) -> Bool {
-            return value.bool ?? impl.defaultValueByOption(option: impl.faultOptons.boolToleranceStrategy)
+            return value.bool ?? impl.defaultValueByOption(option: impl.faultOptons.boolToleranceStrategy, in: value)
         }
 
         func decode(_: String.Type) -> String {
-            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy)
+            return value.string ?? impl.defaultValueByOption(option: impl.faultOptons.stringToleranceStrategy, in: value)
         }
 
         func decode(_: Double.Type) -> Double {
-            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy)
+            return value.double ?? impl.defaultValueByOption(option: impl.faultOptons.doubleToleranceStrategy, in: value)
         }
 
         func decode(_: Float.Type) -> Float {
-            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy)
+            return value.float ?? impl.defaultValueByOption(option: impl.faultOptons.floatToleranceStrategy, in: value)
         }
 
         func decode(_: Int.Type) -> Int {
-            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy)
+            return value.int ?? impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value)
         }
 
         func decode(_: Int8.Type) -> Int8 {
-            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int8 ?? Int8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
 
         func decode(_: Int16.Type) -> Int16 {
-            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int16 ?? Int16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
 
         func decode(_: Int32.Type) -> Int32 {
-            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int32 ?? Int32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
 
         func decode(_: Int64.Type) -> Int64 {
-            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy))
+            return value.int64 ?? Int64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.intToleranceStrategy, in: value))
         }
 
         func decode(_: UInt.Type) -> UInt {
-            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy)
+            return value.uInt ?? impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value)
         }
 
         func decode(_: UInt8.Type) -> UInt8 {
-            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt8 ?? UInt8(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
 
         func decode(_: UInt16.Type) -> UInt16 {
-            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt16 ?? UInt16(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
 
         func decode(_: UInt32.Type) -> UInt32 {
-            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt32 ?? UInt32(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
 
         func decode(_: UInt64.Type) -> UInt64 {
-            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy))
+            return value.uInt64 ?? UInt64(truncatingIfNeeded: impl.defaultValueByOption(option: impl.faultOptons.uintToleranceStrategy, in: value))
         }
 
         func decode<T>(_: T.Type) throws -> T where T: Decodable {
@@ -1078,3 +1105,12 @@ extension FaultToleranceJSONDecoderImpl {
         }
     }
 }
+
+
+// MARK: SwiftJSON default value
+fileprivate let swiftJsonDefaultBoolValue: Bool = false
+fileprivate let swiftJsonDefaultIntValue: Int = 0
+fileprivate let swiftJsonDefaultUIntValue: UInt = 0
+fileprivate let swiftJsonDefaultFloatValue: Float = 0.0
+fileprivate let swiftJsonDefaultDoubleValue: Double = 0.0
+fileprivate let swiftJsonDefaultStringValue: String = ""
